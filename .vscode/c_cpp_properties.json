@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "name": "GBA (ARM7TDMI)",
+            "includePath": [
+                "${workspaceFolder}/src",
+                "C:/msys64/opt/devkitpro/devkitARM/arm-none-eabi/include",
+                "C:/msys64/opt/devkitpro/libgba/include"
+            ],
+            "defines": [
+                "__arm__",
+                "__GBA__",
+                "ARM7"
+            ],
+            "compilerPath": "C:/msys64/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc.exe",
+            "compilerArgs": [
+                "-mcu=arm7tdmi",
+                "-mthumb",
+                "-mthumb-interwork"
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-arm"
+        }
+    ],
+    "version": 4
+}
