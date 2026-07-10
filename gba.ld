@@ -11,10 +11,10 @@ MEMORY {
 SECTIONS {
     .crt0   :   { *(.crt0) }                > rom
     .text   :   { *(.text*) *(.rodata*) }   > rom
-    .crt0   :   { *(.data*) }               > iwram AT > rom
+    .data   :   { *(.data*) }               > iwram AT > rom
     .bss (NOLOAD)   :   {
-        __bs_start__ = .;
-        *(bss*) *(COMMON)
+        __bss_start__ = .;
+        *(.bss*) *(COMMON)
         . = ALIGN(4);
         __bss_end__ = .;
     } > iwram

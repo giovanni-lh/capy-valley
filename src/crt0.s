@@ -20,7 +20,7 @@ _gba_start:
     msr     cpsr_c, #0x1f       @ switch to system mode
     ldr     sp, =0x03008000     @ stack on top of iwram
 
-    ldr     r0, =__bs_start__   @ zero bss
+    ldr     r0, =__bss_start__   @ zero bss
     ldr     r1, =__bss_end__
     mov     r2, #0
 .Lbss:
