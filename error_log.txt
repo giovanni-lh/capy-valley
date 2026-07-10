@@ -3,7 +3,7 @@ $ make run MGBA='/c/Program Files/mGBA/mGBA.exe'
 mkdir -p build
 /opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc -mthumb -mthumb-interwork -mcpu=arm7tdmi -mtune=arm7tdmi -O2 -Wall -fno-strict-aliasing -fomit-frame-pointer -c -o build/main.o src/main.c
   CC  src/main.c
-/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc -mthumb -mthumb-interwork -mcpu=arm7tdmi -mtune=arm7tdmi -O2 -Wall -fno-strict-aliasing -fomit-frame-pointer -mthumb-mthumb-interwork -mcpu=arm7tdmi -mtune=arm7tdmi -specs=/opt/devkitpro/devkitARM/arm-none-eabi/lib/gba-cart.specs -Wl,-Map,game.map -o game.elf build/main.o
-arm-none-eabi-gcc.exe: fatal error: cannot read spec file 'C:/msys64/opt/devkitpro/devkitARM/arm-none-eabi/lib/gba-cart.specs': No such file or directory
+/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc -mthumb -mthumb-interwork -mcpu=arm7tdmi -mtune=arm7tdmi -O2 -Wall -fno-strict-aliasing -fomit-frame-pointer -mthumb-mthumb-interwork -mcpu=arm7tdmi -mtune=arm7tdmi -specs=gba-cart.specs -Wl,-Map,game.map -o game.elf build/main.o
+arm-none-eabi-gcc.exe: fatal error: cannot read spec file 'gba-cart.specs': No such file or directory
 compilation terminated.
 make: *** [Makefile:37: game.elf] Error 1

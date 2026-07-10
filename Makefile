@@ -22,7 +22,7 @@ ARCH := -mthumb -mthumb-interwork -mcpu=arm7tdmi -mtune=arm7tdmi
 CFLAGS := $(ARCH) -O2 -Wall -fno-strict-aliasing -fomit-frame-pointer
 
 SPECS := $(DEVKITARM)/arm-none-eabi/lib/gba-cart.specs
-LDFLAGS := $(ARCH) -specs=$(SPECS) -Wl,-Map,$(TARGET).map
+LDFLAGS := $(ARCH) -specs=gba-cart.specs -Wl,-Map,$(TARGET).map
 
 .PHONY: all run clean
 
