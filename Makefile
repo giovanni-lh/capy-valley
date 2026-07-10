@@ -21,8 +21,8 @@ OBJS := $(patsubst src/%.c, build/%.o, $(SRCS))
 ARCH := -mthumb -mthumb-interwork -mcpu=arm7tdmi -mtune=arm7tdmi
 CFLAGS := $(ARCH) -O2 -Wall -fno-strict-aliasing -fomit-frame-pointer
 
-DEVKITARM_WIN := $(shell cygpath -m $(DEVKITARM))
-LDFLAGS := $(ARCH) -specs=$(DEVKITARM_WIN)/arm-none-eabi/lib/gba-cart.specs -Wl,-Map,$(TARGET).map
+CRTOBJ := build/crt0.o
+LDFLAGS := $(ARCH) -T gba.ld -Wl,-Map,$(TARGET).map
 
 .PHONY: all run clean
 
@@ -33,9 +33,13 @@ $(TARGET).gba: $(TARGET).elf
 	$(GBAFIX) $@ > /dev/null
 	@echo "  ROM  $@ (done)"
 
-$(TARGET).elf: $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+$(TARGET).elf: $(CRTOBJ) $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 	@echo "  LD  $@"
+
+$(CRTOBJ): src/crt0.s | build
+	$(CC) $(ARCH) -x assembler-with-cpp -c -o $@ $<
+	@echo "  AS  $<"
 
 build/%.o: src/%.c | build
 	$(CC) $(CFLAGS) -c -o $@ $<
