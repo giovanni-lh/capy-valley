@@ -34,7 +34,7 @@ $(TARGET).gba: $(TARGET).elf
 	@echo "  ROM  $@ (done)"
 
 $(TARGET).elf: $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 	@echo "  LD  $@"
 
 build/%.o: src/%.c | build
