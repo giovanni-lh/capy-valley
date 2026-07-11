@@ -29,6 +29,7 @@ typedef int32_t s32;
 #define DCNT_OBJ    (1 << 12)
 
 /* — BG Layer 2 registers (we use BG2 for the terrain Layer) —————————— */
+#define REG_BG0CNT  (*(volatile u16*)0x04000008)
 #define REG_BG2CNT  (*(volatile u16*)0x0400000C)
 #define REG_BG2HOFS (*(volatile u16*)0x04000018) /* write-only */
 #define REG_BG2VOFS (*(volatile u16*)0x0400001A) /* write-only */

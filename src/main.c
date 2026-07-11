@@ -2,10 +2,13 @@
 #include "input.h"
 #include "map.h"
 #include "player.h"
+#include "clock.h"
+#include "hud.h"
 
 int main(void){
-    REG_DISPCNT = DCNT_MODE0 | DCNT_BG2 | DCNT_OBJ | DCNT_OBJ_1D;
+    REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG2 | DCNT_OBJ | DCNT_OBJ_1D;
 
+    REG_BG0CNT = BG_CBB(1) | BG_SBB(30) | BG_4BPP | BG_SIZE_32x32 | BG_PRIO(0);
     REG_BG2CNT = BG_CBB(0) | BG_SBB(28) | BG_4BPP | BG_SIZE_64x32 | BG_PRIO(3);
 
     map_init();
@@ -23,12 +26,19 @@ int main(void){
     Player p;
     player_init(&p, 112, 72);
 
+    Clock clk;
+    clock_init(&clk);
+    hud_init();
+
+
     while (1) {
         vsync();
         input_update();
         player_update(&p);
+        clock_tick(&clk);
+        hud_update(&clk);
 
-        int cam_x = p.wx - 122;
+        int cam_x = p.wx - 112;
         int cam_y = p.wy - 72;
         if (cam_x < 0) cam_x = 0;
         if (cam_x > 80) cam_x = 80;

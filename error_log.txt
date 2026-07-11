@@ -1,1 +1,22 @@
-none
+lamkh@JLMSI UCRT64 /c/Users/lamkh/Code/Capy-Valley
+$ make run MGBA='/c/Program Files/mGBA/mGBA.exe'
+mkdir -p build
+/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc -mthumb -mthumb-interwork -mcpu=arm7tdmi -mtune=arm7tdmi -x assembler-with-cpp -c -o build/crt0.o src/crt0.s
+  AS  src/crt0.s
+/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc -mthumb -mthumb-interwork -mcpu=arm7tdmi -mtune=arm7tdmi -O2 -Wall -fno-strict-aliasing -fomit-frame-pointer -c -o build/clock.o src/clock.c
+  CC  src/clock.c
+/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc -mthumb -mthumb-interwork -mcpu=arm7tdmi -mtune=arm7tdmi -O2 -Wall -fno-strict-aliasing -fomit-frame-pointer -c -o build/hud.o src/hud.c
+src/hud.c:10:25: error: macro 'R8' passed 8 arguments, but takes just 7
+   10 |     { R8(0,1,1,1,1,1,1,0),R8(1,0,0,0,0,0,0,1),
+      |                         ^
+src/hud.c:3:9: note: macro 'R8' defined here
+    3 | #define R8(ab,c,d,e,f,g,h) \
+      |         ^~
+src/hud.c:10:7: error: 'R8' undeclared here (not in a function)
+   10 |     { R8(0,1,1,1,1,1,1,0),R8(1,0,0,0,0,0,0,1),
+      |       ^~
+src/hud.c:10:7: note: 'R8' is a function-like macro and might be used incorrectly
+src/hud.c:10:45: error: macro 'R8' passed 8 arguments, but takes just 7
+   10 |     { R8(0,1,1,1,1,1,1,0),R8(1,0,0,0,0,0,0,1),
+      |                                             ^
+src/hud.c:3:9: note: macro 'R8' defined here...
