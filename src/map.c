@@ -1,16 +1,21 @@
 #include "map.h"
 
-static const u16 tile_colors[9] = {
-    RGB15(0, 0, 0),       /* 0: reserved */
-    RGB15(6, 20, 3),      /* 1: GRASS */
-    RGB15(18, 12, 4),     /* 2: DIRT */
-    RGB15(16, 16, 16),    /* 3: PATH */
-    RGB15(3, 14, 26),     /* 4: WATER */
-    RGB15(2, 12, 2),      /* 5: TREE */
-    RGB15(20, 14, 6),     /* 6: FENCE */
-    RGB15(10, 10, 10),    /* 7: WALL */
-    RGB15(22, 18, 12),    /* 8: FLOOR */
+static const u16 tile_colors[12] = {
+    RGB15(0, 0, 0),       /* 0:  reserved */
+    RGB15(6, 20, 3),      /* 1:  GRASS */
+    RGB15(18, 12, 4),     /* 2:  DIRT */
+    RGB15(16, 16, 16),    /* 3:  PATH */
+    RGB15(3, 14, 26),     /* 4:  WATER */
+    RGB15(2, 12, 2),      /* 5:  TREE */
+    RGB15(20, 14, 6),     /* 6:  FENCE */
+    RGB15(10, 10, 10),    /* 7:  WALL */
+    RGB15(22, 18, 12),    /* 8:  FLOOR */
+    RGB15(10, 7, 2),      /* 9:  TILLED */
+    RGB15(7, 9, 5),       /* 10: WATERED */
+    RGB15(6, 11, 3),      /* 11: PLANTED */
 };
+
+static u8 farm_state[30][40];
 
 /* tile IDs: 1=GRASS 2=DIRT 3=PATH 4=WATER 5=TREE 6=FENCE 7=WALL 8=FLOOR */
 static const u8 farm_map[30][40] = {
@@ -61,10 +66,10 @@ static void map_load(void) {
 }
 
 void map_init(void) {
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 12; i++)
         BG_PALETTE[i] = tile_colors[i];
 
-    for (int t = 1; t <= 8; t++) {
+    for (int t = 1; t <= 11; t++) {
         volatile u32 *tile = BG_CHARBLOCK(0) + t * 8;
         u32 word = (u32)t * 0x11111111u;
         for (int r = 0; r < 8; r++) tile[r] = word;
@@ -76,6 +81,7 @@ u8 map_tile_at(int wx, int wy) {
     int col = wx / 8;
     int row = wy / 8;
     if (col < 0 || col >= 40 || row < 0 || row >= 30) return TILE_TREE;
+    if (farm_state[row][col] != 0) return farm_state[row][col];
     return farm_map[row][col];
 }
 
@@ -84,4 +90,54 @@ int map_is_solid(u8 tile_id) {
            tile_id == TILE_TREE ||
            tile_id == TILE_FENCE ||
            tile_id == TILE_WALL;
+}
+
+void map_till(int wx, int wy) {
+    int col = wx / 8;
+    int row = wy / 8;
+
+    if (col < 0 || col >= 40 || row < 0 || row >= 30) return;
+    if (farm_map[row][col] != TILE_DIRT) return;
+
+    farm_state[row][col] = TILE_TILLED;
+    volatile u16 *sbb = (col < 32) ? BG_SCREENBLOCK(28) : BG_SCREENBLOCK(29);
+    int scol = (col < 32) ? col : col - 32;
+    sbb[row * 32 + scol] = TILE_TILLED;
+}
+
+void map_water(int wx, int wy) {
+    int col = wx / 8;
+    int row = wy / 8;
+
+    if (col < 0 || col >= 40 || row < 0 || row >= 30) return;
+    if (farm_state[row][col] != TILE_TILLED) return;
+
+    farm_state[row][col] = TILE_WATERED;
+
+    volatile u16 *sbb = (col < 32) ? BG_SCREENBLOCK(28) : BG_SCREENBLOCK(29);
+    int scol = (col < 32) ? col : col - 32;
+    sbb[row * 32 + scol] = TILE_WATERED;
+}
+
+void map_dry_fields(void) {
+    for (int row = 0; row < 30; row++) {
+        for (int col = 0; col < 40; col++) {
+            if (farm_state[row][col] != TILE_WATERED) continue;
+            farm_state[row][col] = TILE_TILLED;
+            volatile u16 *sbb = (col < 32) ? BG_SCREENBLOCK(28) : BG_SCREENBLOCK(29);
+            int scol = (col < 32) ? col : col - 32;
+            sbb[row * 32 + scol] = TILE_TILLED;
+        }
+    }
+}
+
+void map_plant (int wx, int wy) {
+    int col = wx / 8;
+    int row = wy / 8;
+    if (col < 0 || col >= 40 || row < 0 || row >= 30) return;
+    if (farm_state[row][col] != TILE_WATERED) return;
+    farm_state[row][col] = TILE_PLANTED;
+    volatile u16 *sbb = (col < 32) ? BG_SCREENBLOCK(28) : BG_SCREENBLOCK(29);
+    int scol = (col < 32) ? col : col - 32;
+    sbb[row * 32 + scol] - TILE_PLANTED;
 }

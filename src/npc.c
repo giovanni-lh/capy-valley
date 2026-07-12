@@ -5,6 +5,7 @@ void npc_init(Npc *n, int wx, int wy, int oam_idx, int pal_bank) {
     n->wy = wy;
     n->oam_idx = oam_idx;
     n->pal_bank = pal_bank;
+    n->hearts = 0;
 }
 
 void npc_draw(const Npc *n, int cam_x, int cam_y) {
@@ -14,6 +15,7 @@ void npc_draw(const Npc *n, int cam_x, int cam_y) {
     OAM[n->oam_idx].attr0 = ATTR0_Y(sy) | ATTR0_NORMAL | ATTR0_CLR4 | ATTR0_SQUARE;
     OAM[n->oam_idx].attr1 = ATTR1_X(sx) | ATTR1_SZ16;
     OAM[n->oam_idx].attr2 = ATTR2_TILE(0) | ATTR2_PRIO(0) | ATTR2_PALETTE(n->pal_bank);
+    OAM[n->oam_idx].pad = 0;
 }
 
 void npc_hide(const Npc *n) {

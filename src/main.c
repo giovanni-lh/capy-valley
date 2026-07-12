@@ -38,19 +38,24 @@ int main(void){
     };
 
     Npc npc1;
-    npc_init(&npc1, 160, 88, 1, 1);
+    npc_init(&npc1, 48, 72, 1, 1);
 
     Clock clk;
     clock_init(&clk);
     hud_init();
 
     int dlg_open = 0;
+    int prev_day = clk.day;
 
     while (1) {
         vsync();
         input_update();
         player_update(&p);
         clock_tick(&clk);
+        if (clk.day != prev_day) {
+            map_dry_fields();
+            prev_day = clk.day;
+        }
         hud_update(&clk);
         npc_schedule_apply(&npc1, &sched1, clock_hour(&clk));
 
@@ -59,12 +64,23 @@ int main(void){
         int near_npc = (dx > -24 && dx < 24 && dy > -24 && dy < 24);
 
         if (!dlg_open && near_npc && key_pressed(KEY_A)) {
+            const char *line;
+            if      (npc1.hearts < 3) line = "HELLO TRAVELER";
+            else if (npc1.hearts < 6) line = "GOOD DAY FRIEND";
+            else    line = "WELCOME BACK";
+            npc1.hearts++;
+            if (npc1.hearts > 10) npc1.hearts = 10;
             dlg_open = 1;
-            dlg_show("HELLO TRAVELER");
+            dlg_show(line);
         } else if (dlg_open && key_pressed(KEY_A)) {
             dlg_open = 0;
             dlg_hide();
+        } else if (!dlg_open && key_pressed(KEY_A)) {
+            map_water(p.wx + 8, p.wy + 8);
         }
+
+        if (key_pressed(KEY_B)) map_till(p.wx + 8, p.wy + 8);
+        if (key_pressed(KEY_SELECT)) map_plant(p.wx + 8, p.wy + 8);
 
         int cam_x = p.wx - 112;
         int cam_y = p.wy - 72;

@@ -6,6 +6,7 @@ typedef struct {
     int wy;
     int oam_idx;
     int pal_bank;
+    int hearts;
 } Npc;
 
 #define NPC_MAX_WAYPOINTS 8

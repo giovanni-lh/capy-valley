@@ -195,7 +195,7 @@ void dlg_show(const char *text) {
         char c = text[i];
         int idx;
         if (c == ' ')
-            idx = 0;
+            idx = 2;
         else if (c >= 'A' && c <= 'Z')
             idx = 3 + (c - 'A'); // Adjust index based on font_tiles array
         else
