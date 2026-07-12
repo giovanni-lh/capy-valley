@@ -50,7 +50,7 @@ LOAD C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb
  *fill*         0x080000f4        0x4 
  .crt0.__stub   0x080000f8        0xc linker stubs
 
-.text           0x08000108     0x1aa0
+.text           0x08000108     0x1ae4
  *(.text*)
  .text          0x08000108        0x0 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crti.o
  .text          0x08000108        0x0 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtbegin.o
@@ -121,47 +121,46 @@ LOAD C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb
  .rodata        0x080014d4      0x360 build/dialogue.o
  .rodata        0x08001834      0x160 build/hud.o
  .rodata.str1.4
-                0x08001994       0x67 build/main.o
- *fill*         0x080019fb        0x1 
- .rodata        0x080019fc       0x20 build/main.o
- .rodata        0x08001a1c      0x148 build/map.o
- .rodata        0x08001b64       0x20 build/player.o
+                0x08001994       0x9c build/main.o
+ .rodata        0x08001a30       0x30 build/main.o
+ .rodata        0x08001a60      0x148 build/map.o
+ .rodata        0x08001ba8       0x20 build/player.o
  .rodata.all_implied_fbits
-                0x08001b84       0x24 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtend.o
+                0x08001bc8       0x24 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtend.o
 
-.glue_7         0x08001ba8        0x0
- .glue_7        0x08001ba8        0x0 linker stubs
+.glue_7         0x08001bec        0x0
+ .glue_7        0x08001bec        0x0 linker stubs
 
-.glue_7t        0x08001ba8        0x0
- .glue_7t       0x08001ba8        0x0 linker stubs
+.glue_7t        0x08001bec        0x0
+ .glue_7t       0x08001bec        0x0 linker stubs
 
-.vfp11_veneer   0x08001ba8        0x0
- .vfp11_veneer  0x08001ba8        0x0 linker stubs
+.vfp11_veneer   0x08001bec        0x0
+ .vfp11_veneer  0x08001bec        0x0 linker stubs
 
-.v4_bx          0x08001ba8        0x0
- .v4_bx         0x08001ba8        0x0 linker stubs
+.v4_bx          0x08001bec        0x0
+ .v4_bx         0x08001bec        0x0 linker stubs
 
-.init           0x08001ba8        0xc
- .init          0x08001ba8        0x4 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crti.o
-                0x08001ba8                _init
- .init          0x08001bac        0x8 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtn.o
+.init           0x08001bec        0xc
+ .init          0x08001bec        0x4 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crti.o
+                0x08001bec                _init
+ .init          0x08001bf0        0x8 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtn.o
 
-.fini           0x08001bb4        0xc
- .fini          0x08001bb4        0x4 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crti.o
-                0x08001bb4                _fini
- .fini          0x08001bb8        0x8 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtn.o
+.fini           0x08001bf8        0xc
+ .fini          0x08001bf8        0x4 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crti.o
+                0x08001bf8                _fini
+ .fini          0x08001bfc        0x8 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtn.o
 
-.iplt           0x08001bc0        0x0
- .iplt          0x08001bc0        0x0 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtbegin.o
+.iplt           0x08001c04        0x0
+ .iplt          0x08001c04        0x0 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtbegin.o
 
-.eh_frame       0x08001bc0        0x4
- .eh_frame      0x08001bc0        0x0 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtbegin.o
- .eh_frame      0x08001bc0        0x4 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtend.o
+.eh_frame       0x08001c04        0x4
+ .eh_frame      0x08001c04        0x0 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtbegin.o
+ .eh_frame      0x08001c04        0x4 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtend.o
 
-.rel.dyn        0x08001bc4        0x0
- .rel.iplt      0x08001bc4        0x0 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtbegin.o
+.rel.dyn        0x08001c08        0x0
+ .rel.iplt      0x08001c08        0x0 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtbegin.o
 
-.data           0x03000000        0x8 load address 0x08001bc4
+.data           0x03000000        0x8 load address 0x08001c08
  *(.data*)
  .data          0x03000000        0x0 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crti.o
  .data          0x03000000        0x0 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtbegin.o
@@ -184,16 +183,16 @@ LOAD C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb
  .data          0x03000008        0x0 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtend.o
  .data          0x03000008        0x0 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtn.o
 
-.init_array     0x03000008        0x4 load address 0x08001bcc
+.init_array     0x03000008        0x4 load address 0x08001c10
  .init_array    0x03000008        0x4 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtbegin.o
 
-.fini_array     0x0300000c        0x4 load address 0x08001bd0
+.fini_array     0x0300000c        0x4 load address 0x08001c14
  .fini_array    0x0300000c        0x4 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtbegin.o
 
-.igot.plt       0x03000010        0x0 load address 0x08001bd4
+.igot.plt       0x03000010        0x0 load address 0x08001c18
  .igot.plt      0x03000010        0x0 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crtbegin.o
 
-.bss            0x03000010      0x278 load address 0x08001bd4
+.bss            0x03000010      0x278 load address 0x08001c18
                 0x03000010                        __bss_start__ = .
  *(.bss*)
  .bss           0x03000010        0x0 C:/msys64/opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/16.1.0/thumb/crti.o

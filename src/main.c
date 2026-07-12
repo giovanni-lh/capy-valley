@@ -18,6 +18,13 @@ static int rng_range(int lo, int hi) {
     return lo + (int)((rng_state >> 16) % (unsigned)(hi - lo + 1));
 }
 
+static const char *fish_names[] = {
+    "CAUGHT A CARP!",
+    "CAUGHT A BASS!",
+    "CAUGHT A SALMON!",
+    "CAUGHT A TROUT!",
+};
+
 int main(void) {
     REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1 | DCNT_BG2 | DCNT_OBJ | DCNT_OBJ_1D;
 
@@ -103,7 +110,7 @@ int main(void) {
         if (p.step_frames == 0) {
             if (fish_state == FISH_BITE && key_pressed(KEY_A)) {
                 fish_state = FISH_RESULT;
-                dlg_show("CAUGHT A FISH!");
+                dlg_show(fish_names[clk.season]);
             } else if (fish_state == FISH_RESULT && key_pressed(KEY_A)) {
                 fish_state = FISH_IDLE;
                 dlg_hide();
@@ -130,25 +137,29 @@ int main(void) {
             }
 
             if (fish_state == FISH_WAIT || fish_state == FISH_BITE) {
+                if (key_pressed(KEY_B)) {
+                    fish_state = FISH_IDLE;
+                    dlg_hide();
+                }
             } else if (fish_state == FISH_IDLE) {
                 if (key_pressed(KEY_B)) map_till(face_wx, face_wy);
                 if (key_pressed(KEY_SELECT)) map_plant(face_wx, face_wy);
                 if (key_pressed(KEY_START)) map_harvest(face_wx, face_wy);
             }
-
-            int cam_x = p.wx - 112;
-            int cam_y = p.wy - 72;
-            if (cam_x < 0) cam_x = 0;
-            if (cam_x > 80) cam_x = 80;
-            if (cam_y < 0) cam_y = 0;
-            if (cam_y > 80) cam_y = 80;
-
-            REG_BG2HOFS = (u16)cam_x;
-            REG_BG2VOFS = (u16)cam_y;
-
-            OAM[0].attr0 = ATTR0_Y(p.wy - cam_y) | ATTR0_NORMAL | ATTR0_CLR4 | ATTR0_SQUARE;
-            OAM[0].attr1 = ATTR1_X(p.wx - cam_x) | ATTR1_SZ16;
-            npc_draw(&npc1, cam_x, cam_y);
         }
+
+        int cam_x = p.wx - 112;
+        int cam_y = p.wy - 72;
+        if (cam_x < 0) cam_x = 0;
+        if (cam_x > 80) cam_x = 80;
+        if (cam_y < 0) cam_y = 0;
+        if (cam_y > 80) cam_y = 80;
+
+        REG_BG2HOFS = (u16)cam_x;
+        REG_BG2VOFS = (u16)cam_y;
+
+        OAM[0].attr0 = ATTR0_Y(p.wy - cam_y) | ATTR0_NORMAL | ATTR0_CLR4 | ATTR0_SQUARE;
+        OAM[0].attr1 = ATTR1_X(p.wx - cam_x) | ATTR1_SZ16;
+        npc_draw(&npc1, cam_x, cam_y);
     }
 }
