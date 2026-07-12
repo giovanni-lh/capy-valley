@@ -24,4 +24,3 @@ void map_plant(int wx, int wy);
 void map_grow_crops(void);
 void map_harvest(int wx, int wy);
 void map_wilt_crops(void);
-int map_is_adjacent_water(int wx, int wy);

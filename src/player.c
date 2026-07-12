@@ -5,33 +5,52 @@
 #define MAP_W_PX 320
 #define MAP_H_PX 240
 #define SPR_SIZE 16
+#define STEP_PX 16   /* one meta-tile per step */
+#define STEP_FRAMES 8 /* 8 frames x 2 px = 16 px */
 
 static int solid_at(int wx, int wy) {
-    return  map_is_solid(map_tile_at(wx,                wy               )) ||
-            map_is_solid(map_tile_at(wx + SPR_SIZE - 1, wy               )) ||
-            map_is_solid(map_tile_at(wx,                wy + SPR_SIZE - 1)) ||
-            map_is_solid(map_tile_at(wx + SPR_SIZE - 1, wy + SPR_SIZE - 1));
+    return map_is_solid(map_tile_at(wx,                  wy)) ||
+           map_is_solid(map_tile_at(wx + SPR_SIZE - 1,   wy)) ||
+           map_is_solid(map_tile_at(wx,                  wy + SPR_SIZE - 1)) ||
+           map_is_solid(map_tile_at(wx + SPR_SIZE - 1,   wy + SPR_SIZE - 1));
 }
 
 void player_init(Player *p, int start_wx, int start_wy) {
     p->wx = start_wx;
     p->wy = start_wy;
+    p->facing = 1;
+    p->step_frames = 0;
 }
 
 void player_update(Player *p) {
-    int nx = p->wx;
-    int ny = p->wy;
+    if (p->step_frames > 0) {
+        static const int sdx[] = { 0, 0, -2, 2 };
+        static const int sdy[] = { -2, 2, 0, 0 };
+        p->wx += sdx[p->facing];
+        p->wy += sdy[p->facing];
+        p->step_frames--;
+        return;
+    }
 
-    if (key_held(KEY_UP))      ny -= 2;
-    if (key_held(KEY_DOWN))    ny += 2;
-    if (key_held(KEY_LEFT))    nx -= 2;
-    if (key_held(KEY_RIGHT))   nx += 2;
+    int dir = -1;
+    if (key_held(KEY_UP))    dir = 0;
+    else if (key_held(KEY_DOWN))  dir = 1;
+    else if (key_held(KEY_LEFT))  dir = 2;
+    else if (key_held(KEY_RIGHT)) dir = 3;
 
-    if (nx < 0) nx = 0;
-    if (nx > MAP_W_PX - SPR_SIZE) nx = MAP_W_PX - SPR_SIZE;
-    if (ny < 0) ny = 0;
-    if (ny > MAP_H_PX - SPR_SIZE) ny = MAP_H_PX - SPR_SIZE;
+    if (dir < 0) return;
+    p->facing = dir;
 
-    if (!solid_at(nx, p->wy)) p->wx = nx;
-    if (!solid_at(p->wx, ny)) p->wy = ny;
+    static const int ddx[] = { 0, 0, -STEP_PX, STEP_PX };
+    static const int ddy[] = { -STEP_PX, STEP_PX, 0, 0 };
+    int dest_wx = p->wx + ddx[dir];
+    int dest_wy = p->wy + ddy[dir];
+
+    if (dest_wx < 0) dest_wx = 0;
+    if (dest_wx > MAP_W_PX - SPR_SIZE) dest_wx = MAP_W_PX - SPR_SIZE;
+    if (dest_wy < 0) dest_wy = 0;
+    if (dest_wy > MAP_H_PX - SPR_SIZE) dest_wy = MAP_H_PX - SPR_SIZE;
+
+    if (solid_at(dest_wx, dest_wy)) return;
+    p->step_frames = STEP_FRAMES;
 }

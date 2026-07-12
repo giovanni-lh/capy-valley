@@ -4,6 +4,8 @@
 typedef struct {
     int wx;
     int wy;
+    int facing;
+    int step_frames;
 } Player;
 
 void player_init(Player *p, int start_wx, int start_wy);
