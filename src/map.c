@@ -1,6 +1,6 @@
 #include "map.h"
 
-static const u16 tile_colors[12] = {
+static const u16 tile_colors[13] = {
     RGB15(0, 0, 0),       /* 0:  reserved */
     RGB15(6, 20, 3),      /* 1:  GRASS */
     RGB15(18, 12, 4),     /* 2:  DIRT */
@@ -13,9 +13,11 @@ static const u16 tile_colors[12] = {
     RGB15(10, 7, 2),      /* 9:  TILLED */
     RGB15(7, 9, 5),       /* 10: WATERED */
     RGB15(6, 11, 3),      /* 11: PLANTED */
+    RGB15(4, 24, 4),      /* 12: GROWN */
 };
 
 static u8 farm_state[30][40];
+static u8 crop_age[30][40];
 
 /* tile IDs: 1=GRASS 2=DIRT 3=PATH 4=WATER 5=TREE 6=FENCE 7=WALL 8=FLOOR */
 static const u8 farm_map[30][40] = {
@@ -66,10 +68,10 @@ static void map_load(void) {
 }
 
 void map_init(void) {
-    for (int i = 0; i < 12; i++)
+    for (int i = 0; i < 13; i++)
         BG_PALETTE[i] = tile_colors[i];
 
-    for (int t = 1; t <= 11; t++) {
+    for (int t = 1; t <= 12; t++) {
         volatile u32 *tile = BG_CHARBLOCK(0) + t * 8;
         u32 word = (u32)t * 0x11111111u;
         for (int r = 0; r < 8; r++) tile[r] = word;
@@ -137,7 +139,55 @@ void map_plant (int wx, int wy) {
     if (col < 0 || col >= 40 || row < 0 || row >= 30) return;
     if (farm_state[row][col] != TILE_WATERED) return;
     farm_state[row][col] = TILE_PLANTED;
+    crop_age[row][col] = 0;
     volatile u16 *sbb = (col < 32) ? BG_SCREENBLOCK(28) : BG_SCREENBLOCK(29);
     int scol = (col < 32) ? col : col - 32;
-    sbb[row * 32 + scol] - TILE_PLANTED;
+    sbb[row * 32 + scol] = TILE_PLANTED;
+}
+
+void map_grow_crops (void) {
+    for (int row = 0; row < 30; row++) {
+        for (int col = 0; col < 40; col++) {
+            if (farm_state[row][col] != TILE_PLANTED) continue;
+            crop_age[row][col]++;
+            if (crop_age[row][col] < 4) continue;
+            farm_state[row][col] = TILE_GROWN;
+            volatile u16 *sbb = (col < 32) ? BG_SCREENBLOCK(28) : BG_SCREENBLOCK(29);
+            int scol = (col < 32) ? col : col - 32;
+            sbb[row * 32 + scol] = TILE_GROWN;
+        }
+    }
+}
+
+void map_harvest(int wx, int wy) {
+    int col = wx / 8;
+    int row = wy / 8;
+    if (col < 0 || col >= 40 || row < 0 || row >= 30) return;
+    if (farm_state[row][col] != TILE_GROWN) return;
+    farm_state[row][col] = TILE_TILLED;
+    crop_age[row][col] = 0;
+    volatile u16 *sbb = (col < 32) ? BG_SCREENBLOCK(28) : BG_SCREENBLOCK (29);
+    int scol = (col < 32) ? col : col - 32;
+    sbb[row * 32 + scol] = TILE_TILLED;
+}
+
+void map_wilt_crops (void) {
+    for (int row = 0; row < 30; row++) {
+        for (int col = 0; col < 40; col++) {
+            u8 s = farm_state[row][col];
+            if (s!= TILE_PLANTED && s != TILE_GROWN) continue;
+            farm_state[row][col] = TILE_TILLED;
+            crop_age[row][col] = 0;
+            volatile u16 *sbb = (col < 32) ? BG_SCREENBLOCK(28) : BG_SCREENBLOCK(29);
+            int scol = (col < 32) ? col : col - 32;
+            sbb[row * 32 + scol] = TILE_TILLED;
+        }
+    }
+}
+
+int map_is_adjacent_water(int wx, int wy) {
+    return  map_tile_at(wx,      wy - 8)    == TILE_WATER ||
+            map_tile_at(wx,      wy + 8)    == TILE_WATER ||
+            map_tile_at(wx - 8,  wy)        == TILE_WATER ||
+            map_tile_at(wx + 8,  wy)        == TILE_WATER;
 }

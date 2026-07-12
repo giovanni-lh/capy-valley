@@ -12,6 +12,7 @@
 #define TILE_TILLED     9
 #define TILE_WATERED    10
 #define TILE_PLANTED    11
+#define TILE_GROWN      12
 
 void map_init(void);
 u8 map_tile_at(int wx, int wy);
@@ -20,3 +21,7 @@ void map_till(int wx, int wy);
 void map_water(int wx, int wy);
 void map_dry_fields(void);
 void map_plant(int wx, int wy);
+void map_grow_crops(void);
+void map_harvest(int wx, int wy);
+void map_wilt_crops(void);
+int map_is_adjacent_water(int wx, int wy);

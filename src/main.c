@@ -46,6 +46,7 @@ int main(void){
 
     int dlg_open = 0;
     int prev_day = clk.day;
+    int prev_season = clk.season;
 
     while (1) {
         vsync();
@@ -54,6 +55,11 @@ int main(void){
         clock_tick(&clk);
         if (clk.day != prev_day) {
             map_dry_fields();
+            map_grow_crops();
+            if(clk.season != prev_season) {
+                map_wilt_crops();
+                prev_season = clk.season;
+            }
             prev_day = clk.day;
         }
         hud_update(&clk);
@@ -62,6 +68,7 @@ int main(void){
         int dx = (p.wx + 8) - (npc1.wx + 8);
         int dy = (p.wy + 8) - (npc1.wy + 8);
         int near_npc = (dx > -24 && dx < 24 && dy > -24 && dy < 24);
+        int near_water = map_is_adjacent_water(p.wx + 8, p.wy + 8);
 
         if (!dlg_open && near_npc && key_pressed(KEY_A)) {
             const char *line;
@@ -75,12 +82,16 @@ int main(void){
         } else if (dlg_open && key_pressed(KEY_A)) {
             dlg_open = 0;
             dlg_hide();
+        } else if (!dlg_open && near_water && key_pressed(KEY_A)) {
+            dlg_open = 1;
+            dlg_show("SPLASH...");
         } else if (!dlg_open && key_pressed(KEY_A)) {
             map_water(p.wx + 8, p.wy + 8);
         }
 
         if (key_pressed(KEY_B)) map_till(p.wx + 8, p.wy + 8);
         if (key_pressed(KEY_SELECT)) map_plant(p.wx + 8, p.wy + 8);
+        if (key_pressed(KEY_START)) map_harvest(p.wx + 8, p.wy + 8);
 
         int cam_x = p.wx - 112;
         int cam_y = p.wy - 72;
