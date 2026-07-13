@@ -17,7 +17,7 @@
 /* font_tiles[0] = space, font_tiles[1..26] = A..Z.
    Each glyph is 8 rows of 8 pixels, stored as u32 words.
    Pixels are either B (dark background) or T (text color). */
-static const u32 font_tiles[27][8] = {
+static const u32 font_tiles[29][8] = {
     /* space */
     { R8(B,B,B,B,B,B,B,B), R8(B,B,B,B,B,B,B,B),
       R8(B,B,B,B,B,B,B,B), R8(B,B,B,B,B,B,B,B),
@@ -152,6 +152,16 @@ static const u32 font_tiles[27][8] = {
     { R8(T,T,T,T,T,B,B,B), R8(B,B,B,T,B,B,B,B),
       R8(B,B,T,B,B,B,B,B), R8(T,T,T,T,T,B,B,B),
       R8(B,B,B,B,B,B,B,B), R8(B,B,B,B,B,B,B,B),
+      R8(B,B,B,B,B,B,B,B), R8(B,B,B,B,B,B,B,B) },
+    /* ! */
+    { R8(B,T,B,B,B,B,B,B), R8(B,T,B,B,B,B,B,B),
+      R8(B,T,B,B,B,B,B,B), R8(B,T,B,B,B,B,B,B),
+      R8(B,B,B,B,B,B,B,B), R8(B,T,B,B,B,B,B,B),
+      R8(B,B,B,B,B,B,B,B), R8(B,B,B,B,B,B,B,B) },
+    /* . */
+    { R8(B,B,B,B,B,B,B,B), R8(B,B,B,B,B,B,B,B),
+      R8(B,B,B,B,B,B,B,B), R8(B,B,B,B,B,B,B,B),
+      R8(B,B,B,B,B,B,B,B), R8(B,T,B,B,B,B,B,B),
       R8(B,B,B,B,B,B,B,B), R8(B,B,B,B,B,B,B,B) }
 };
 
@@ -169,7 +179,7 @@ void dlg_init(void) {
     for (int r = 0; r < 8; r++) cbb2[1 * 8 + r] = 0x11111111u;
 
     /* Tiles 2-28: space (index 0) and A-Z (indices 1-26) */
-    for (int g = 0; g < 27; g++) {
+    for (int g = 0; g < 29; g++) {
         volatile u32 *dst = cbb2 + (g + 2) * 8;
         for (int r = 0; r < 8; r++) dst[r] = font_tiles[g][r];
     }
@@ -198,6 +208,10 @@ void dlg_show(const char *text) {
             idx = 2;
         else if (c >= 'A' && c <= 'Z')
             idx = 3 + (c - 'A'); // Adjust index based on font_tiles array
+        else if (c == '!')
+            idx = 29;
+        else if (c == '.')
+            idx = 30;
         else
             idx = 2;
         sbb[18 * 32 + col] = DLG_TILE(idx);

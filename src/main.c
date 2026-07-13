@@ -41,6 +41,8 @@ int main(void) {
     OBJ_PALETTE[1] = RGB15(26, 18, 9);
     OBJ_PALETTE[16] = RGB15(0, 0, 0);
     OBJ_PALETTE[17] = RGB15(10, 18, 28);
+    OBJ_PALETTE[32] = RGB15(0, 0, 0);
+    OBJ_PALETTE[33] = RGB15(28, 24, 0);
 
     for (int i = 0; i < 4 * 8; i++) OBJ_TILES[i] = 0x11111111u;
 
@@ -58,6 +60,10 @@ int main(void) {
     Npc npc1;
     npc_init(&npc1, 48, 96, 1, 1); /* col 3, row 6 - grass by house door */
 
+    Npc chicken;
+    npc_init(&chicken, 128, 144, 2, 2);
+    int chicken_fed = 0;
+
     Clock clk;
     clock_init(&clk);
     hud_init();
@@ -67,6 +73,8 @@ int main(void) {
     int prev_season = clk.season;
     int fish_state = FISH_IDLE;
     int fish_timer = 0;
+    int coins = 0;
+    int seeds = 0;
 
     /* facing offsets: 0=up 1=down 2=Left 3=right */
     static const int face_dx[] = { 0, 0, -16, 16};
@@ -87,6 +95,7 @@ int main(void) {
             prev_day = clk.day;
         }
         hud_update(&clk);
+        hud_set_coins(coins);
         npc_schedule_apply(&npc1, &sched1, clock_hour(&clk));
 
         /* tile directly in front of the player */
@@ -95,6 +104,9 @@ int main(void) {
 
         int near_npc = (face_wx == npc1.wx && face_wy == npc1.wy);
         int near_water = (map_tile_at(face_wx, face_wy) == TILE_WATER);
+        int near_ore = (map_tile_at(face_wx, face_wy) == TILE_ORE);
+        int near_chicken = (face_wx == chicken.wx && face_wy == chicken.wy);
+        int near_shop = (face_wx == 160 && face_wy == 80);
 
         /* fishing timer - runs every frame regardless of step */
         if (fish_state == FISH_WAIT && --fish_timer == 0) {
@@ -111,6 +123,7 @@ int main(void) {
             if (fish_state == FISH_BITE && key_pressed(KEY_A)) {
                 fish_state = FISH_RESULT;
                 dlg_show(fish_names[clk.season]);
+                coins += 5;
             } else if (fish_state == FISH_RESULT && key_pressed(KEY_A)) {
                 fish_state = FISH_IDLE;
                 dlg_hide();
@@ -128,6 +141,16 @@ int main(void) {
                 if (npc1.hearts > 10) npc1.hearts = 10;
                 dlg_open = 1;
                 dlg_show(line);
+            } else if (!dlg_open && near_shop && key_pressed(KEY_A)) {
+                if (coins >= 5) {
+                    coins -= 5;
+                    seeds++;
+                    dlg_open = 1;
+                    dlg_show("BOUGHT SEEDS!");
+                } else {
+                    dlg_open = 1;
+                    dlg_show("NEED COINS");
+                }
             } else if (!dlg_open && near_water && key_pressed(KEY_A)) {
                 fish_state = FISH_WAIT;
                 fish_timer = rng_range(60, 180);
@@ -143,8 +166,31 @@ int main(void) {
                 }
             } else if (fish_state == FISH_IDLE) {
                 if (key_pressed(KEY_B)) map_till(face_wx, face_wy);
-                if (key_pressed(KEY_SELECT)) map_plant(face_wx, face_wy);
-                if (key_pressed(KEY_START)) map_harvest(face_wx, face_wy);
+                if (key_pressed(KEY_SELECT)) {
+                    int prev = map_tile_at(face_wx, face_wy);
+                    map_plant(face_wx, face_wy);
+                    if (map_tile_at(face_wx, face_wy) != prev) seeds--;
+                }
+                if (key_pressed(KEY_START)) {
+                    int prev = map_tile_at(face_wx, face_wy);
+                    map_harvest(face_wx, face_wy);
+                    if (map_tile_at(face_wx, face_wy) != prev) coins += 10;
+                }
+                if(!dlg_open && near_ore && key_pressed(KEY_L)) {
+                    map_mine(face_wx, face_wy);
+                    dlg_open = 1;
+                    dlg_show("MINED ORE!");
+                }
+                if (!dlg_open && near_chicken && key_pressed(KEY_R)) {
+                    if (!chicken_fed) {
+                        chicken_fed = 1;
+                        dlg_open = 1;
+                        dlg_show("FED CHICKEN!");
+                    } else {
+                        dlg_open = 1;
+                        dlg_show("CLUCK!");
+                    }
+                }
             }
         }
 
@@ -161,5 +207,6 @@ int main(void) {
         OAM[0].attr0 = ATTR0_Y(p.wy - cam_y) | ATTR0_NORMAL | ATTR0_CLR4 | ATTR0_SQUARE;
         OAM[0].attr1 = ATTR1_X(p.wx - cam_x) | ATTR1_SZ16;
         npc_draw(&npc1, cam_x, cam_y);
+        npc_draw(&chicken, cam_x, cam_y);
     }
 }

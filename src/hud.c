@@ -6,7 +6,7 @@
 
 #define HUD_TILE(n) ((u16)((n) | (1u << 12)))
 
-static const u32 font_tiles[11][8] = {
+static const u32 font_tiles[12][8] = {
     { R8(0,1,1,1,1,1,1,0),R8(1,0,0,0,0,0,0,1),
       R8(1,0,0,0,0,0,0,1),R8(1,0,0,0,0,0,0,1),
       R8(1,0,0,0,0,0,0,1),R8(1,0,0,0,0,0,0,1),
@@ -61,6 +61,11 @@ static const u32 font_tiles[11][8] = {
       R8(0,0,1,1,0,0,0,0),R8(0,0,0,0,0,0,0,0),
       R8(0,0,1,1,0,0,0,0),R8(0,0,1,1,0,0,0,0),
       R8(0,0,0,0,0,0,0,0),R8(0,0,0,0,0,0,0,0)},/* : */
+
+    { R8(0,1,1,1,1,0,0,0),R8(1,0,0,0,0,0,0,0),
+      R8(1,0,0,0,0,0,0,0),R8(1,0,0,1,1,0,0,0),
+      R8(1,0,0,0,0,1,0,0),R8(1,0,0,0,0,1,0,0),
+      R8(0,1,1,1,1,0,0,0),R8(0,0,0,0,0,0,0,0)},/* G (gold) */
 };
 
 void hud_init(void) {
@@ -68,12 +73,21 @@ void hud_init(void) {
     BG_PALETTE[17] = RGB15(31, 31, 31);
 
     volatile u32 *cbb1 = BG_CHARBLOCK(1);
-    for (int g = 0; g < 11; g++) {
+    for (int g = 0; g < 12; g++) {
         volatile u32 *dst = cbb1 + (g + 1) * 8;
         for (int r = 0; r < 8; r++) {
             dst[r] = font_tiles[g][r];
         }
     }
+}
+
+void hud_set_coins(int n){
+  if (n > 999) n = 999;
+  volatile u16 *sbb = BG_SCREENBLOCK(30);
+  sbb[26] = HUD_TILE(12);
+  sbb[27] = HUD_TILE(1 + (n / 100) % 10);
+  sbb[28] = HUD_TILE(1 + (n / 10) % 10);
+  sbb[29] = HUD_TILE(1 + n % 10);
 }
 
 void hud_update(const Clock *c) {

@@ -1,6 +1,6 @@
 #include "map.h"
 
-static const u16 tile_colors[13] = {
+static const u16 tile_colors[14] = {
     RGB15(0, 0, 0),     /* 0: reserved */
     RGB15(6, 20, 3),    /* 1: GRASS */
     RGB15(18, 12, 4),   /* 2: DIRT */
@@ -14,6 +14,7 @@ static const u16 tile_colors[13] = {
     RGB15(7, 9, 5),     /* 10: WATERED */
     RGB15(6, 11, 3),    /* 11: PLANTED */
     RGB15(4, 24, 4),    /* 12: GROWN */
+    RGB15(18, 16, 14),  /* 13: ORE */
 };
 
 static u8 farm_state[15][20];
@@ -61,15 +62,28 @@ static void map_load(void) {
 }
 
 void map_init(void) {
-    for (int i = 0; i < 13; i++) {
+    for (int i = 0; i < 14; i++) {
         BG_PALETTE[i] = tile_colors[i];
     }
-    for (int t = 1; t <= 12; t++) {
+    for (int t = 1; t <= 13; t++) {
         volatile u32 *tile = BG_CHARBLOCK(0) + t * 8;
         u32 word = (u32)t * 0x11111111u;
         for (int r = 0; r < 8; r++) tile[r] = word;
     }
     map_load();
+
+    static const int ore[][2] = {
+        {14, 8}, {16, 8},
+        {15, 9},
+        {14, 10}, {16, 10},
+        {13, 12}, {15, 12},
+        {14, 13},
+    };
+    for (int i = 0; i < 8; i++) {
+        int mc = ore[i][0], mr = ore[i][1];
+        farm_state[mr][mc] = TILE_ORE;
+        map_patch(mc, mr, TILE_ORE);
+    }
 }
 
 u8 map_tile_at(int wx, int wy) {
@@ -82,9 +96,10 @@ u8 map_tile_at(int wx, int wy) {
 
 int map_is_solid(u8 tile_id) {
     return tile_id == TILE_WATER ||
-           tile_id == TILE_TREE ||
+           tile_id == TILE_TREE  ||
            tile_id == TILE_FENCE ||
-           tile_id == TILE_WALL;
+           tile_id == TILE_WALL  ||
+           tile_id == TILE_ORE;
 }
 
 void map_till(int wx, int wy) {
@@ -147,11 +162,20 @@ void map_harvest(int wx, int wy) {
     map_patch(mc, mr, TILE_TILLED);
 }
 
+void map_mine(int wx, int wy) {
+    int mc = wx / 16;
+    int mr = wy / 16;
+    if (mc < 0 || mc >= 20 || mr < 0 || mr >= 15) return;
+    if (farm_state[mr][mc] != TILE_ORE) return;
+    farm_state[mr][mc] = 0;
+    map_patch(mc, mr, farm_map[mr][mc]);
+}
+
 void map_wilt_crops(void) {
     for (int mr = 0; mr < 15; mr++) {
         for (int mc = 0; mc < 20; mc++) {
             u8 s = farm_state[mr][mc];
-            if (s == TILE_PLANTED && s == TILE_GROWN) continue;
+            if (s != TILE_PLANTED && s != TILE_GROWN) continue;
             farm_state[mr][mc] = TILE_TILLED;
             crop_age[mr][mc] = 0;
             map_patch(mc, mr, TILE_TILLED);
